@@ -1,1 +1,36 @@
-# qualisys-log
+# Qualisys Log
+
+Configuration:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <!-- LOG -->
+    <add key="ShowConsole" value="false" />
+    <add key="FullLog" value="true" />
+    <add key="LogName" value="AplicationLog" />
+  </appSettings>
+</configuration>
+```
+
+Basic use:
+
+```csharp
+using System;
+using QualisysLog;
+
+public class Program
+{
+	public static void Main()
+	{
+            QsLog.WriteInfo("Para escribir información");
+            QsLog.WriteSuccess("Para escribir proceso exitoso");
+            QsLog.WriteTracking("Para escribir seguimiento de proceso");
+            QsLog.WriteProcess("Para escribir proceso");
+            QsLog.WriteWarning("Para escribir advertencia");
+            QsLog.WriteError("Para escribir error");
+            QsLog.WriteException("Para escribir excepción");
+	}
+}
+```
