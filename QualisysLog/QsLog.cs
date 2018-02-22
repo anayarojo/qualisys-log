@@ -58,6 +58,9 @@ namespace QualisysLog
         /// <summary>
         ///     Método para registrar un texto libre directamente en el log.
         /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
         /// <param name="pStrFormat">
         ///     Formato del mensaje
         /// </param>
@@ -67,9 +70,69 @@ namespace QualisysLog
         /// <remarks>
         ///     Raul Anaya, 14/12/2017
         /// </remarks>
-        public static void Write(string pStrFormat, params object[] pArrObjArgs)
+        public static void Write(string pStrLogName, string pStrFormat, params object[] pArrObjArgs)
         {
-            Write(string.Format(pStrFormat, pArrObjArgs));
+            Write(pStrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
+        ///     Método para registrar un texto libre directamente en el log.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void Write(string pStrLogName, string pStrMessage)
+        {
+            string lStrApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", "");
+            string lStrDirPath = Path.Combine(lStrApplicationPath, "Logs");
+            string lStrDateDirPath = Path.Combine(lStrDirPath, DateTime.Now.ToString("yyyyMMdd"));
+            string lStrLogPath = Path.Combine
+            (
+                lStrDateDirPath,
+                string.Format("{0}.log", !string.IsNullOrEmpty(pStrLogName) ? pStrLogName : QsLog.LogName)
+            );
+            string lStrDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ");
+
+            try
+            {
+                if (!Directory.Exists(lStrDirPath))
+                {
+                    Directory.CreateDirectory(lStrDirPath);
+                }
+
+                if (!Directory.Exists(lStrDateDirPath))
+                {
+                    Directory.CreateDirectory(lStrDateDirPath);
+                }
+
+                using (StreamWriter lObjWriter = new StreamWriter(lStrLogPath, true))
+                {
+                    lObjWriter.WriteLine(string.Concat(lStrDate, pStrMessage));
+                }
+            }
+            catch
+            {
+                lStrLogPath = Path.Combine
+                (
+                    lStrDateDirPath,
+                    string.Format
+                    (
+                        "{0} {1}.log",
+                        !string.IsNullOrEmpty(pStrLogName) ? pStrLogName : QsLog.LogName,
+                        DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")
+                    )
+                );
+                using (StreamWriter lObjWriter = new StreamWriter(lStrLogPath, true))
+                {
+                    lObjWriter.WriteLine(string.Concat(lStrDate, pStrMessage));
+                }
+            }
         }
 
         /// <summary>
@@ -83,25 +146,7 @@ namespace QualisysLog
         /// </remarks>
         public static void Write(string pStrMessage)
         {
-            string lStrApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", "");
-            string lStrLogPath = Path.Combine(lStrApplicationPath, string.Format("{0}.log", QsLog.LogName));
-            string lStrDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ");
-
-            try
-            {
-                using (StreamWriter lObjWriter = new StreamWriter(lStrLogPath, true))
-                {
-                    lObjWriter.WriteLine(string.Concat(lStrDate, pStrMessage));
-                }
-            }
-            catch
-            {
-                lStrLogPath = Path.Combine(lStrApplicationPath, string.Concat(DateTime.Now.ToString("yyyy-MM-dd-"), Guid.NewGuid().ToString(), ".log"));
-                using (StreamWriter lObjWriter = new StreamWriter(lStrLogPath, true))
-                {
-                    lObjWriter.WriteLine(string.Concat(lStrDate, pStrMessage));
-                }
-            }
+            Write("", pStrMessage);
         }
 
         /// <summary>
@@ -115,7 +160,7 @@ namespace QualisysLog
         /// </remarks>
         public static void WriteInfo(string pStrMessage)
         {
-            Write("[INFO] {0}", pStrMessage);
+            Write("", "[INFO] {0}", pStrMessage);
             ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
         }
 
@@ -137,6 +182,44 @@ namespace QualisysLog
         }
 
         /// <summary>
+        ///     Método para registrar información en el log.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteInfo(string pStrLogName, string pStrMessage)
+        {
+            Write(pStrLogName, "[INFO] {0}", pStrMessage);
+            ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
+        }
+
+        /// <summary>
+        ///     Método para registrar información en el log.
+        /// </summary>
+        /// <param name="pstrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrFormat">
+        ///     Formato del mensaje
+        /// </param>
+        /// <param name="pArrObjArgs">
+        ///     Parámetros del formato del mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteInfo(string pstrLogName, string pStrFormat, params object[] pArrObjArgs)
+        {
+            WriteInfo(pstrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
         ///     Método para registrar un evento exitoso, tal evento solo se registrara si  la propiedad del log 'FullLog' es 'true'.
         /// </summary>
         /// <param name="pStrMessage">
@@ -149,7 +232,7 @@ namespace QualisysLog
         {
             if (FullLog)
             {
-                Write("[SUCCESS] {0}", pStrMessage);
+                Write("", "[SUCCESS] {0}", pStrMessage);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Green);
             }
         }
@@ -172,6 +255,47 @@ namespace QualisysLog
         }
 
         /// <summary>
+        ///     Método para registrar un evento exitoso, tal evento solo se registrara si  la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteSuccess(string pStrLogName, string pStrMessage)
+        {
+            if (FullLog)
+            {
+                Write(pStrLogName, "[SUCCESS] {0}", pStrMessage);
+                ConsoleWriteLine(pStrMessage, ConsoleColor.Green);
+            }
+        }
+
+        /// <summary>
+        ///     Método para registrar un evento exitoso, tal evento solo se registrara si  la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrFormat">
+        ///     Formato del mensaje
+        /// </param>
+        /// <param name="pArrObjArgs">
+        ///     Parámetros del formato del mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteSuccess(string pStrLogName, string pStrFormat, params object[] pArrObjArgs)
+        {
+            WriteSuccess(pStrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
         ///     Método para registrar el seguimiento de un evento, tal seguimiento solo se registrara si  la propiedad del log 'FullLog' es 'true'.
         /// </summary>
         /// <param name="pStrMessage">
@@ -184,7 +308,7 @@ namespace QualisysLog
         {
             if (FullLog)
             {
-                Write("[TRACK] {0}", pStrMessage);
+                Write("", "[TRACK] {0}", pStrMessage);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
             }
         }
@@ -207,6 +331,47 @@ namespace QualisysLog
         }
 
         /// <summary>
+        ///     Método para registrar el seguimiento de un evento, tal seguimiento solo se registrara si  la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteTracking(string pStrLogName, string pStrMessage)
+        {
+            if (FullLog)
+            {
+                Write(pStrLogName, "[TRACK] {0}", pStrMessage);
+                ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
+            }
+        }
+
+        /// <summary>
+        ///     Método para registrar el seguimiento de un evento, tal seguimiento solo se registrara si  la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrFormat">
+        ///     Formato del mensaje
+        /// </param>
+        /// <param name="pArrObjArgs">
+        ///     Parámetros del formato del mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteTracking(string pStrLogName, string pStrFormat, params object[] pArrObjArgs)
+        {
+            WriteTracking(pStrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
         ///     Método para registrar el evento de un proceso, tal evento solo se registrara si la propiedad del log 'FullLog' es 'true'.
         /// </summary>
         /// <param name="pStrMessage">
@@ -219,7 +384,7 @@ namespace QualisysLog
         {
             if (FullLog)
             {
-                Write("[PROCESS] {0}", pStrMessage);
+                Write("", "[PROCESS] {0}", pStrMessage);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Yellow);
             }
         }
@@ -242,6 +407,47 @@ namespace QualisysLog
         }
 
         /// <summary>
+        ///     Método para registrar el evento de un proceso, tal evento solo se registrara si la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteProcess(string pStrLogName, string pStrMessage)
+        {
+            if (FullLog)
+            {
+                Write(pStrLogName, "[PROCESS] {0}", pStrMessage);
+                ConsoleWriteLine(pStrMessage, ConsoleColor.Yellow);
+            }
+        }
+
+        /// <summary>
+        ///     Método para registrar el evento de un proceso, tal evento solo se registrara si la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrFormat">
+        ///     Formato del mensaje
+        /// </param>
+        /// <param name="pArrObjArgs">
+        ///     Parámetros del formato del mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteProcess(string pStrLogName, string pStrFormat, params object[] pArrObjArgs)
+        {
+            WriteProcess(pStrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
         ///     Método para registrar una advertencia, tal advertencia solo se registrara si la propiedad del log 'FullLog' es 'true'.
         /// </summary>
         /// <param name="pStrMessage">
@@ -254,7 +460,7 @@ namespace QualisysLog
         {
             if (FullLog)
             {
-                Write(string.Format("[WARNING] {0}", pStrMessage));
+                Write("", string.Format("[WARNING] {0}", pStrMessage));
                 ConsoleWriteLine(pStrMessage, ConsoleColor.DarkYellow);
             }
         }
@@ -277,6 +483,47 @@ namespace QualisysLog
         }
 
         /// <summary>
+        ///     Método para registrar una advertencia, tal advertencia solo se registrara si la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteWarning(string pStrLogName, string pStrMessage)
+        {
+            if (FullLog)
+            {
+                Write(pStrLogName, string.Format("[WARNING] {0}", pStrMessage));
+                ConsoleWriteLine(pStrMessage, ConsoleColor.DarkYellow);
+            }
+        }
+
+        /// <summary>
+        ///     Método para registrar una advertencia, tal advertencia solo se registrara si la propiedad del log 'FullLog' es 'true'.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrFormat">
+        ///     Formato del mensaje
+        /// </param>
+        /// <param name="pArrObjArgs">
+        ///     Parámetros del formato del mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteWarning(string pStrLogName, string pStrFormat, params object[] pArrObjArgs)
+        {
+            WriteWarning(pStrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
         ///     Método para registrar un error.
         /// </summary>
         /// <param name="pStrMessage">
@@ -287,7 +534,7 @@ namespace QualisysLog
         /// </remarks>
         public static void WriteError(string pStrMessage)
         {
-            Write("[ERROR] {0}", pStrMessage);
+            Write("", "[ERROR] {0}", pStrMessage);
             ConsoleWriteLine(pStrMessage, ConsoleColor.Red);
         }
 
@@ -309,6 +556,44 @@ namespace QualisysLog
         }
 
         /// <summary>
+        ///     Método para registrar un error.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrMessage">
+        ///     Mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteError(string pStrLogName, string pStrMessage)
+        {
+            Write(pStrLogName, "[ERROR] {0}", pStrMessage);
+            ConsoleWriteLine(pStrMessage, ConsoleColor.Red);
+        }
+
+        /// <summary>
+        ///     Método para registrar un error.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pStrFormat">
+        ///     Formato del mensaje
+        /// </param>
+        /// <param name="pArrObjArgs">
+        ///     Parámetros del formato del mensaje
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteError(string pStrLogName, string pStrFormat, params object[] pArrObjArgs)
+        {
+            WriteError(pStrLogName, string.Format(pStrFormat, pArrObjArgs));
+        }
+
+        /// <summary>
         ///     Método para registrar una excepción.
         /// </summary>
         /// <param name="pObjException">
@@ -323,11 +608,39 @@ namespace QualisysLog
             {
                 if (FullLog)
                 {
-                    Write("[ERROR] {0}", pObjException.ToString());
+                    Write("", "[ERROR] {0}", pObjException.ToString());
                 }
                 else
                 {
-                    Write("[ERROR] {0}", pObjException.Message);
+                    Write("", "[ERROR] {0}", pObjException.Message);
+                }
+                ConsoleWriteLine(pObjException.ToString(), ConsoleColor.Red);
+            }
+        }
+
+        /// <summary>
+        ///     Método para registrar una excepción.
+        /// </summary>
+        /// <param name="pStrLogName">
+        ///     Nombre del log
+        /// </param>
+        /// <param name="pObjException">
+        ///     Excepción
+        /// </param>
+        /// <remarks>
+        ///     Raul Anaya, 14/12/2017
+        /// </remarks>
+        public static void WriteException(string pStrLogName, Exception pObjException)
+        {
+            if (pObjException != null)
+            {
+                if (FullLog)
+                {
+                    Write(pStrLogName, "[ERROR] {0}", pObjException.ToString());
+                }
+                else
+                {
+                    Write(pStrLogName, "[ERROR] {0}", pObjException.Message);
                 }
                 ConsoleWriteLine(pObjException.ToString(), ConsoleColor.Red);
             }
