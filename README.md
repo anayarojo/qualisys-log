@@ -1,6 +1,12 @@
-# Qualisys Log
+## Qualisys Log
 
-Configuration:
+#### Nuget installation:
+
+```
+Install-Package QualisysLog -Version 1.0.0
+```
+
+#### Configuration:
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -14,7 +20,7 @@ Configuration:
 </configuration>
 ```
 
-Basic use:
+#### Basic use:
 
 ```csharp
 using System;
@@ -34,3 +40,7 @@ public class Program
 	}
 }
 ```
+
+See more
+
+[Nuget package page](https://www.nuget.org/packages/QualisysLog/)

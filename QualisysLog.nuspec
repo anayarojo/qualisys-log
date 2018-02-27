@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>QualisysLog</id>
+    <version>1.0.0</version>
+    <authors>anayarojo</authors>
+    <owners>anayarojo</owners>
+    <licenseUrl>https://github.com/anayarojo/qualisys-log/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/anayarojo/qualisys-log</projectUrl>
+    <iconUrl>https://github.com/anayarojo/qualisys-log/blob/master/QualisysLog/icon.PNG?raw=true</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Utilería para escribir logs</description>
+    <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
+    <copyright>Copyright 2018 anayarojo</copyright>
+    <tags>QualisysLog Log Qualisys</tags>
+    <dependencies>
+      <dependency id="QualisysConfig" version="1.0.1" />
+    </dependencies>
+  </metadata>
+  <files>
+	<file src="QualisysLog\bin\Release\QualisysLog.dll" target="lib\QualisysLog.dll" />
+	<file src="QualisysLog\bin\Release\QualisysLog.xml" target="lib\QualisysLog.xml" />
+	<file src="QualisysLog\bin\Release\app.config.transform" target="content\app.config.transform" />
+	<file src="QualisysLog\bin\Release\web.config.transform" target="content\web.config.transform" />
+  </files>
+</package>
