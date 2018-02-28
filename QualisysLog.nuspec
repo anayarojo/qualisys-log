@@ -2,24 +2,34 @@
 <package >
   <metadata>
     <id>QualisysLog</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>anayarojo</authors>
     <owners>anayarojo</owners>
     <licenseUrl>https://github.com/anayarojo/qualisys-log/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/anayarojo/qualisys-log</projectUrl>
-    <iconUrl>https://github.com/anayarojo/qualisys-log/blob/master/QualisysLog/icon.PNG?raw=true</iconUrl>
+    <iconUrl>https://github.com/anayarojo/qualisys-log/blob/master/QualisysLog/icon.png?raw=true</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Utilería para escribir logs</description>
-    <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
+    <releaseNotes>Ahora se puede guardar en el log de eventos.</releaseNotes>
     <copyright>Copyright 2018 anayarojo</copyright>
     <tags>QualisysLog Log Qualisys</tags>
     <dependencies>
-      <dependency id="QualisysConfig" version="1.0.1" />
+      <dependency id="QualisysConfig" version="1.0.2" />
     </dependencies>
   </metadata>
   <files>
-	<file src="QualisysLog\bin\Release\QualisysLog.dll" target="lib\QualisysLog.dll" />
-	<file src="QualisysLog\bin\Release\QualisysLog.xml" target="lib\QualisysLog.xml" />
+	<!--DLL AND DOC-->
+	<file src="QualisysLog\bin\Release-net45\QualisysLog.dll" target="lib\net45\QualisysLog.dll" />
+	<file src="QualisysLog\bin\Release-net45\QualisysLog.xml" target="lib\net45\QualisysLog.xml" />
+	<file src="QualisysLog\bin\Release-net451\QualisysLog.dll" target="lib\net451\QualisysLog.dll" />
+	<file src="QualisysLog\bin\Release-net451\QualisysLog.xml" target="lib\net451\QualisysLog.xml" />
+	<file src="QualisysLog\bin\Release-net452\QualisysLog.dll" target="lib\net452\QualisysLog.dll" />
+	<file src="QualisysLog\bin\Release-net452\QualisysLog.xml" target="lib\net452\QualisysLog.xml" />
+	<file src="QualisysLog\bin\Release-net46\QualisysLog.dll" target="lib\net46\QualisysLog.dll" />
+	<file src="QualisysLog\bin\Release-net46\QualisysLog.xml" target="lib\net46\QualisysLog.xml" />
+	<file src="QualisysLog\bin\Release-net461\QualisysLog.dll" target="lib\net461\QualisysLog.dll" />
+	<file src="QualisysLog\bin\Release-net461\QualisysLog.xml" target="lib\net461\QualisysLog.xml" />
+	<!-- SAMPLE CONFIG -->
 	<file src="QualisysLog\bin\Release\app.config.transform" target="content\app.config.transform" />
 	<file src="QualisysLog\bin\Release\web.config.transform" target="content\web.config.transform" />
   </files>

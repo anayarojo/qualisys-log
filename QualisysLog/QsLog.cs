@@ -1,5 +1,6 @@
 ﻿using QualisysConfig;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -14,6 +15,7 @@ namespace QualisysLog
     public static class QsLog
     {
         private static bool mBolShowConsole = false;
+        private static bool mBolSaveEventLog = false;
         private static bool mBolFullLog = false;
         private static string mStrLogName = "log";
 
@@ -22,6 +24,7 @@ namespace QualisysLog
             try
             {
                 mBolShowConsole = QsConfig.GetValue<bool>("ShowConsole");
+                mBolSaveEventLog = QsConfig.GetValue<bool>("SaveEventLog");
                 mBolFullLog = QsConfig.GetValue<bool>("FullLog");
                 mStrLogName = QsConfig.GetValue<string>("LogName");
             }
@@ -45,6 +48,14 @@ namespace QualisysLog
         public static bool ShowConsole
         {
             get { return mBolShowConsole; }
+        }
+
+        /// <summary>
+        ///     Propiedad que indica si se guardara en el log de eventos, esta propiedad se puede cambiar desde el App/Web.config
+        /// </summary>
+        public static bool SaveEventLog
+        {
+            get { return mBolSaveEventLog; }
         }
 
         /// <summary>
@@ -161,6 +172,7 @@ namespace QualisysLog
         public static void WriteInfo(string pStrMessage)
         {
             Write("", "[INFO] {0}", pStrMessage);
+            WriteEventLog(pStrMessage, EventLogEntryType.Information, 40);
             ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
         }
 
@@ -196,6 +208,7 @@ namespace QualisysLog
         public static void WriteInfo(string pStrLogName, string pStrMessage)
         {
             Write(pStrLogName, "[INFO] {0}", pStrMessage);
+            WriteEventLog(pStrMessage, EventLogEntryType.Information, 41);
             ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
         }
 
@@ -233,6 +246,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write("", "[SUCCESS] {0}", pStrMessage);
+                WriteEventLog(pStrMessage, EventLogEntryType.Information, 30);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Green);
             }
         }
@@ -271,6 +285,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write(pStrLogName, "[SUCCESS] {0}", pStrMessage);
+                WriteEventLog(pStrMessage, EventLogEntryType.Information, 33);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Green);
             }
         }
@@ -309,6 +324,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write("", "[TRACK] {0}", pStrMessage);
+                WriteEventLog(pStrMessage, EventLogEntryType.Information, 10);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
             }
         }
@@ -347,6 +363,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write(pStrLogName, "[TRACK] {0}", pStrMessage);
+                WriteEventLog(pStrMessage, EventLogEntryType.Information, 11);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Gray);
             }
         }
@@ -385,6 +402,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write("", "[PROCESS] {0}", pStrMessage);
+                WriteEventLog(pStrMessage, EventLogEntryType.Information, 20);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Yellow);
             }
         }
@@ -423,6 +441,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write(pStrLogName, "[PROCESS] {0}", pStrMessage);
+                WriteEventLog(pStrMessage, EventLogEntryType.Information, 21);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.Yellow);
             }
         }
@@ -461,6 +480,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write("", string.Format("[WARNING] {0}", pStrMessage));
+                WriteEventLog(pStrMessage, EventLogEntryType.Warning, 50);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.DarkYellow);
             }
         }
@@ -499,6 +519,7 @@ namespace QualisysLog
             if (FullLog)
             {
                 Write(pStrLogName, string.Format("[WARNING] {0}", pStrMessage));
+                WriteEventLog(pStrMessage, EventLogEntryType.Warning, 51);
                 ConsoleWriteLine(pStrMessage, ConsoleColor.DarkYellow);
             }
         }
@@ -535,6 +556,7 @@ namespace QualisysLog
         public static void WriteError(string pStrMessage)
         {
             Write("", "[ERROR] {0}", pStrMessage);
+            WriteEventLog(pStrMessage, EventLogEntryType.Error, 60);
             ConsoleWriteLine(pStrMessage, ConsoleColor.Red);
         }
 
@@ -570,6 +592,7 @@ namespace QualisysLog
         public static void WriteError(string pStrLogName, string pStrMessage)
         {
             Write(pStrLogName, "[ERROR] {0}", pStrMessage);
+            WriteEventLog(pStrMessage, EventLogEntryType.Error, 61);
             ConsoleWriteLine(pStrMessage, ConsoleColor.Red);
         }
 
@@ -614,6 +637,7 @@ namespace QualisysLog
                 {
                     Write("", "[ERROR] {0}", pObjException.Message);
                 }
+                WriteEventLog(pObjException.ToString(), EventLogEntryType.Error, 70);
                 ConsoleWriteLine(pObjException.ToString(), ConsoleColor.Red);
             }
         }
@@ -642,7 +666,40 @@ namespace QualisysLog
                 {
                     Write(pStrLogName, "[ERROR] {0}", pObjException.Message);
                 }
+                WriteEventLog(pObjException.ToString(), EventLogEntryType.Error, 71);
                 ConsoleWriteLine(pObjException.ToString(), ConsoleColor.Red);
+            }
+        }
+
+        private static void WriteEventLog(string pStrMessage, EventLogEntryType pEnmType, int pIntId)
+        {
+            if (SaveEventLog)
+            {
+                try
+                {
+                    EventLog lObjEventLog = new EventLog();
+                    string lStrCurrentProcessName = Process.GetCurrentProcess().ProcessName;
+
+                    if (!EventLog.SourceExists(lStrCurrentProcessName))
+                    {
+                        EventLog.CreateEventSource(lStrCurrentProcessName, "Application");
+                    }
+
+                    lObjEventLog.Source = lStrCurrentProcessName;
+                    lObjEventLog.WriteEntry(pStrMessage, pEnmType, pIntId);
+                    lObjEventLog.Close();
+                }
+                catch (Exception lObjException)
+                {
+                    if (FullLog)
+                    {
+                        Write("", "[ERROR] {0}", lObjException.ToString());
+                    }
+                    else
+                    {
+                        Write("", "[ERROR] {0}", lObjException.Message);
+                    }
+                }
             }
         }
 
