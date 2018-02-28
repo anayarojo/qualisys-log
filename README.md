@@ -3,7 +3,7 @@
 #### Nuget installation:
 
 ```
-Install-Package QualisysLog -Version 1.0.0
+Install-Package QualisysLog -Version 1.0.1
 ```
 
 #### Configuration:
@@ -14,6 +14,7 @@ Install-Package QualisysLog -Version 1.0.0
   <appSettings>
     <!-- LOG -->
     <add key="ShowConsole" value="false" />
+    <add key="SaveEventLog" value="false" />
     <add key="FullLog" value="true" />
     <add key="LogName" value="AplicationLog" />
   </appSettings>
