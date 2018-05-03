@@ -2,19 +2,20 @@
 <package >
   <metadata>
     <id>QualisysLog</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <authors>anayarojo</authors>
     <owners>anayarojo</owners>
     <licenseUrl>https://github.com/anayarojo/qualisys-log/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/anayarojo/qualisys-log</projectUrl>
-    <iconUrl>https://github.com/anayarojo/qualisys-log/blob/master/QualisysLog/icon.png?raw=true</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/anayarojo/qualisys-log/master/QualisysLog/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <title>Qualisys Log</title>
     <description>Utilería para escribir logs</description>
     <releaseNotes>Ahora se puede guardar en el log de eventos.</releaseNotes>
     <copyright>Copyright 2018 anayarojo</copyright>
-    <tags>QualisysLog Log Qualisys</tags>
+    <tags>qualisys-log log qualisys anayarojo</tags>
     <dependencies>
-      <dependency id="QualisysConfig" version="1.0.2" />
+      <dependency id="QualisysConfig" version="1.0.3" />
     </dependencies>
   </metadata>
   <files>
