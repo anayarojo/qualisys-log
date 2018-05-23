@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace QualisysLog
 {
@@ -14,6 +15,7 @@ namespace QualisysLog
     /// </remarks>
     public static class QsLog
     {
+        private static ReaderWriterLock mObjLocker = new ReaderWriterLock();
         private static bool mBolShowConsole = false;
         private static bool mBolSaveEventLog = false;
         private static bool mBolFullLog = false;
@@ -100,49 +102,18 @@ namespace QualisysLog
         /// </remarks>
         public static void Write(string pStrLogName, string pStrMessage)
         {
-            string lStrApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", "");
-            string lStrDirPath = Path.Combine(lStrApplicationPath, "Logs");
-            string lStrDateDirPath = Path.Combine(lStrDirPath, DateTime.Now.ToString("yyyyMMdd"));
-            string lStrLogPath = Path.Combine
-            (
-                lStrDateDirPath,
-                string.Format("{0}.log", !string.IsNullOrEmpty(pStrLogName) ? pStrLogName : QsLog.LogName)
-            );
-            string lStrDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ");
-
             try
             {
-                if (!Directory.Exists(lStrDirPath))
-                {
-                    Directory.CreateDirectory(lStrDirPath);
-                }
-
-                if (!Directory.Exists(lStrDateDirPath))
-                {
-                    Directory.CreateDirectory(lStrDateDirPath);
-                }
-
-                using (StreamWriter lObjWriter = new StreamWriter(lStrLogPath, true))
-                {
-                    lObjWriter.WriteLine(string.Concat(lStrDate, pStrMessage));
-                }
+                mObjLocker.AcquireWriterLock(int.MaxValue);
+                File.AppendAllLines(GetLogPath(pStrLogName), GetFormattedMessage(pStrMessage));
             }
             catch
             {
-                lStrLogPath = Path.Combine
-                (
-                    lStrDateDirPath,
-                    string.Format
-                    (
-                        "{0} {1}.log",
-                        !string.IsNullOrEmpty(pStrLogName) ? pStrLogName : QsLog.LogName,
-                        DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")
-                    )
-                );
-                using (StreamWriter lObjWriter = new StreamWriter(lStrLogPath, true))
-                {
-                    lObjWriter.WriteLine(string.Concat(lStrDate, pStrMessage));
-                }
+                File.AppendAllLines(GetAlternativeLogPath(pStrLogName), GetFormattedMessage(pStrMessage));
+            }
+            finally
+            {
+                mObjLocker.ReleaseWriterLock();
             }
         }
 
@@ -721,6 +692,39 @@ namespace QualisysLog
                 Console.WriteLine(pStrMessage);
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
+        }
+
+        private static string[] GetFormattedMessage(string pStrMessage)
+        {
+            return new[] 
+            { 
+                string.Format("{0} {1}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), pStrMessage) 
+            };
+        }
+
+        private static string GetLogPath(string pStrLogName)
+        {
+            string lStrApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", "");
+            string lStrDirPath = Path.Combine(lStrApplicationPath, "Logs");
+            string lStrDateDirPath = Path.Combine(lStrDirPath, DateTime.Now.ToString("yyyyMMdd"));
+            string lStrLogPath = Path.Combine(lStrDateDirPath, string.Format("{0}.log", !string.IsNullOrEmpty(pStrLogName) ? pStrLogName : QsLog.LogName));
+
+            if (!Directory.Exists(lStrDirPath))
+            {
+                Directory.CreateDirectory(lStrDirPath);
+            }
+
+            if (!Directory.Exists(lStrDateDirPath))
+            {
+                Directory.CreateDirectory(lStrDateDirPath);
+            }
+
+            return lStrLogPath;
+        }
+
+        private static string GetAlternativeLogPath(string pStrLogName)
+        {
+            return GetLogPath(pStrLogName).Replace(".log", string.Format(" {0}.log", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));
         }
     }
 }
