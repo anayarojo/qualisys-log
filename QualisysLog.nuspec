@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>QualisysLog</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <authors>anayarojo</authors>
     <owners>anayarojo</owners>
     <licenseUrl>https://github.com/anayarojo/qualisys-log/blob/master/LICENSE</licenseUrl>
@@ -11,7 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>Qualisys Log</title>
     <description>Utilería para escribir logs</description>
-    <releaseNotes>Ahora soporta multi-hilos.</releaseNotes>
+    <releaseNotes>Ahora soporta multi-hilos y rutas personalizadas para el log.</releaseNotes>
     <copyright>Copyright 2018 anayarojo</copyright>
     <tags>qualisys-log log qualisys anayarojo</tags>
     <dependencies>

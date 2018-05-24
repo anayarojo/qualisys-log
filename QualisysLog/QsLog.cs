@@ -20,6 +20,7 @@ namespace QualisysLog
         private static bool mBolSaveEventLog = false;
         private static bool mBolFullLog = false;
         private static string mStrLogName = "log";
+        private static string mStrLogPath = "";
 
         static QsLog()
         {
@@ -29,6 +30,7 @@ namespace QualisysLog
                 mBolSaveEventLog = QsConfig.GetValue<bool>("SaveEventLog");
                 mBolFullLog = QsConfig.GetValue<bool>("FullLog");
                 mStrLogName = QsConfig.GetValue<string>("LogName");
+                mStrLogPath = QsConfig.GetValue<string>("LogPath");
             }
             catch
             {
@@ -66,6 +68,14 @@ namespace QualisysLog
         public static string LogName
         {
             get { return mStrLogName; }
+        }
+
+        /// <summary>
+        ///     Propiedad que indica la ruta del archivo del log, esta propiedad se puede cambiar desde el App/Web.config
+        /// </summary>
+        public static string LogPath
+        {
+            get { return mStrLogPath; }
         }
 
         /// <summary>
@@ -702,22 +712,30 @@ namespace QualisysLog
             };
         }
 
+        private static string GetAppPath()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", "");
+        }
+
         private static string GetLogPath(string pStrLogName)
         {
-            string lStrApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase).Replace("file:\\", "");
-            string lStrDirPath = Path.Combine(lStrApplicationPath, "Logs");
+            string lStrAppPath = "";
+
+            if (!string.IsNullOrEmpty(QsLog.LogPath) && Directory.Exists(QsLog.LogPath))
+            {
+                lStrAppPath = QsLog.LogPath;
+            }
+            else
+            {
+                lStrAppPath = GetAppPath();
+            }
+
+            string lStrDirPath = Path.Combine(lStrAppPath, "Logs");
             string lStrDateDirPath = Path.Combine(lStrDirPath, DateTime.Now.ToString("yyyyMMdd"));
             string lStrLogPath = Path.Combine(lStrDateDirPath, string.Format("{0}.log", !string.IsNullOrEmpty(pStrLogName) ? pStrLogName : QsLog.LogName));
 
-            if (!Directory.Exists(lStrDirPath))
-            {
-                Directory.CreateDirectory(lStrDirPath);
-            }
-
-            if (!Directory.Exists(lStrDateDirPath))
-            {
-                Directory.CreateDirectory(lStrDateDirPath);
-            }
+            if (!Directory.Exists(lStrDirPath)) { Directory.CreateDirectory(lStrDirPath); }
+            if (!Directory.Exists(lStrDateDirPath)) { Directory.CreateDirectory(lStrDateDirPath); }
 
             return lStrLogPath;
         }

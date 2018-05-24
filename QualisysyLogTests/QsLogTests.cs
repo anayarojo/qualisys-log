@@ -50,6 +50,20 @@ namespace QualisysyLogTests
         }
 
         [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.Description("En caso de que no se encuentre la configuración 'LogPath', se utilizara como default el valor 'Empty'.")]
+        public void LogPathConfigNotFound()
+        {
+            // Arrange
+            string lStrExpectedValue = "";
+
+            // Act
+            var lUnkResult = QsLog.LogPath;
+
+            // Assert
+            Assert.AreEqual(lUnkResult, lStrExpectedValue);
+        }
+
+        [TestMethod]
         public void Write()
         {
             QsLog.Write("Hello world!");
